@@ -1,3 +1,9 @@
+
+
+variable "region" {
+  default = ""
+}
+
 variable "s3_lambda_role_name" {
   default     = ""
   description = "Name of the role for the Lambda that receives S3 trigger"
@@ -40,8 +46,22 @@ variable "sender_email" {
 variable "receiver_email" {
   default = ""
 }
-
 variable "instream_bucket_name" {
   default     = ""
   description = "The name of the bucket for input video stream"
+}
+
+variable "outstream_bucket_name" {
+  default     = ""
+  description = "The name of the bucket for output video stream from Media Converter"
+}
+
+variable "mediaconvert_endpoint" {
+  default     = ""
+  description = "The media converter end point"
+}
+
+variable "mediaconvert_name" {
+  default     = ""
+  description = "The name of the media converter"
 }
