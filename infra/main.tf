@@ -18,7 +18,7 @@ resource "aws_lambda_function" "s3_lambda" {
       SENDER_EMAIL          = var.sender_email
       RECEIVER_EMAIL        = var.receiver_email
       REGION                = var.region,
-      OUTPUT_BUCKET         = "${aws_s3_bucket.outstream_bucket.arn}",
+      OUTPUT_BUCKET         = var.outstream_bucket_name,
       MEDIACONVERT_ROLE_ARN = aws_iam_role.mediaconvert_job.arn,
       MEDIACONVERT_ENDPOINT = var.mediaconvert_endpoint,
     }
