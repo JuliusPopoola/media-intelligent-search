@@ -1,5 +1,5 @@
 output "arn" {
-  value = aws_lambda_function.s3_lambda.arn
+  value = aws_lambda_function.mediaconvert_lambda.arn
 }
 
 output "mediaconvert_role_arn" {
@@ -7,5 +7,5 @@ output "mediaconvert_role_arn" {
 }
 
 output "lambda_role_arn" {
-  value = aws_iam_role.s3_lambda_iam.arn
+  value = aws_iam_role.mediaconvert_lambda_role.arn
 }

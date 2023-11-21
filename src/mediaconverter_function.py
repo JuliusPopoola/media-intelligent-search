@@ -4,7 +4,7 @@ import boto3
 from boto3.dynamodb.conditions import Key
 
 OUTPUT_BUCKET = os.environ["OUTPUT_BUCKET"]
-MEDIA_CONVERT_ROLE = os.environ["MEDIACONVERT_ROLE_ARN"]
+MEDIA_CONVERT_ROLE_ARN = os.environ["MEDIACONVERT_ROLE_ARN"]
 MEDIA_CONVERT_ENDPOINT = os.environ["MEDIACONVERT_ENDPOINT"]
 
 REGION = os.environ["REGION"]
@@ -19,7 +19,7 @@ def lambda_handler(event, context):
     if "objectcreated" not in eventName.lower():
         body = {
             'success': True,
-            'message': 'The event type does not require processing, event name is ' +  eventName
+            'message': 'The transcode event does not require processing, event name is ' +  eventName
         }
         
         return {
@@ -51,7 +51,7 @@ def lambda_handler(event, context):
         print('jobSettings:')
         print(json.dumps(jobSettings))
 
-        job = client.create_job(Role=MEDIA_CONVERT_ROLE, UserMetadata=jobMetadata, Settings=jobSettings)
+        job = client.create_job(Role=MEDIA_CONVERT_ROLE_ARN, UserMetadata=jobMetadata, Settings=jobSettings)
         print(json.dumps(job, default=str))
 
         body = {

@@ -1,5 +1,5 @@
-resource "aws_iam_role" "s3_lambda_iam" {
-  name = var.s3_lambda_role_name
+resource "aws_iam_role" "transcribe_lambda_role" {
+  name = "${var.transcribe_label}-lambda-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -14,8 +14,8 @@ resource "aws_iam_role" "s3_lambda_iam" {
   })
 }
 
-resource "aws_iam_policy" "s3_lambda_iam_policy" {
-  name = var.s3_lambda_iam_policy
+resource "aws_iam_policy" "transcribe_lambda_policy" {
+  name = "${var.transcribe_label}-lambda-policy"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -35,8 +35,8 @@ resource "aws_iam_policy" "s3_lambda_iam_policy" {
           "s3:GetObject"
         ]
         Resource = [
-          "arn:aws:s3:::${var.instream_bucket_name}/*",
-          "arn:aws:s3:::${var.outstream_bucket_name}/*"
+          "arn:aws:s3:::${var.outstream_bucket_name}/*",
+          "arn:aws:s3:::${var.transcribe_bucket_name}/*"
         ]
       },
       {
@@ -52,7 +52,7 @@ resource "aws_iam_policy" "s3_lambda_iam_policy" {
           "s3:GetBucketNotification"
         ]
         Resource = [
-          "arn:aws:s3:::${var.instream_bucket_name}"
+          "arn:aws:s3:::${var.outstream_bucket_name}"
         ]
       },
       {
@@ -61,13 +61,13 @@ resource "aws_iam_policy" "s3_lambda_iam_policy" {
           "s3:PutBucketNotification"
         ]
         Resource = [
-          "arn:aws:s3:::${var.outstream_bucket_name}"
+          "arn:aws:s3:::${var.transcribe_bucket_name}"
         ]
       },
       {
         Effect = "Allow",
         Action = [
-          "mediaconvert:*"
+          "transcribe:*"
         ],
         Resource = "*"
       }
@@ -75,13 +75,13 @@ resource "aws_iam_policy" "s3_lambda_iam_policy" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "terraform_lambda_iam_policy_basic_execution" {
-  role       = aws_iam_role.s3_lambda_iam.id
-  policy_arn = aws_iam_policy.s3_lambda_iam_policy.arn
+resource "aws_iam_role_policy_attachment" "transcribe_lambda_iam_policy_basic_execution" {
+  role       = aws_iam_role.transcribe_lambda_role.id
+  policy_arn = aws_iam_policy.transcribe_lambda_policy.arn
 }
 
-resource "aws_iam_role" "mediaconvert_job" {
-  name = "media-intelligent-role"
+resource "aws_iam_role" "transcribe" {
+  name = "${var.transcribe_label}-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -89,26 +89,18 @@ resource "aws_iam_role" "mediaconvert_job" {
         Action = "sts:AssumeRole"
         Effect = "Allow"
         Principal = {
-          Service = "mediaconvert.amazonaws.com"
+          Service = "transcribe.amazonaws.com"
         }
       }
     ]
   })
 }
 
-resource "aws_iam_policy" "mediaconvert_job" {
-  name = "media-intelligent-role-policy"
+resource "aws_iam_policy" "transcribe" {
+  name = "${var.transcribe_label}-policy"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "execute-api:Invoke",
-          "execute-api:ManageConnections"
-        ]
-        Resource = "arn:aws:execute-api:*:*:*"
-      },
       {
         Effect = "Allow"
         Action = [
@@ -121,7 +113,7 @@ resource "aws_iam_policy" "mediaconvert_job" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "mediaconvert_job_policy_basic_execution" {
-  role       = aws_iam_role.mediaconvert_job.id
-  policy_arn = aws_iam_policy.mediaconvert_job.arn
+resource "aws_iam_role_policy_attachment" "transcribe_job_policy_basic_execution" {
+  role       = aws_iam_role.transcribe.id
+  policy_arn = aws_iam_policy.transcribe.arn
 }

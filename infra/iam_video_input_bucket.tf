@@ -21,16 +21,16 @@ resource "aws_s3_bucket_acl" "instream_bucket" {
 resource "aws_s3_bucket_notification" "instream-lambda-trigger" {
   bucket = aws_s3_bucket.instream_bucket.id
   lambda_function {
-    lambda_function_arn = aws_lambda_function.s3_lambda.arn
-    events              = ["s3:ObjectCreated:*", "s3:ObjectRemoved:*"]
+    lambda_function_arn = aws_lambda_function.mediaconvert_lambda.arn
+    events              = ["s3:ObjectCreated:*"]
   }
-  depends_on = [aws_lambda_permission.s3_lambda_permission]
+  depends_on = [aws_lambda_permission.instream_lambda_permission]
 }
 
-resource "aws_lambda_permission" "s3_lambda_permission" {
+resource "aws_lambda_permission" "instream_lambda_permission" {
   statement_id  = "AllowExecutionFromS3Bucket"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.s3_lambda.arn
+  function_name = aws_lambda_function.mediaconvert_lambda.arn
   principal     = "s3.amazonaws.com"
   source_arn    = aws_s3_bucket.instream_bucket.arn
 }
