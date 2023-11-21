@@ -47,8 +47,7 @@ def lambda_handler(event, context):
             jobSettings = json.load(json_data)
 
         jobSettings['Inputs'][0]['FileInput'] = 's3://'+ inputBucket + '/' + inputBucketKey
-        jobSettings['OutputGroups'][0]['OutputGroupSettings']['HlsGroupSettings']['Destination'] = destinationS3 + "hls/"
-        jobSettings['OutputGroups'][1]['OutputGroupSettings']['FileGroupSettings']['Destination'] = destinationS3 + "mp4/"
+        jobSettings['OutputGroups'][0]['OutputGroupSettings']['FileGroupSettings']['Destination'] = destinationS3 + "mp4/"
         print('jobSettings:')
         print(json.dumps(jobSettings))
 
@@ -68,6 +67,8 @@ def lambda_handler(event, context):
         raise
 
     finally:
+        print('Status Code:' + str(statusCode))
+        print(json.dumps(body))
         return {
             'statusCode': statusCode,
             'body': json.dumps(body),
