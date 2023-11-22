@@ -80,7 +80,7 @@ resource "aws_iam_role_policy_attachment" "mediaconvert_lambda_policy_basic_exec
   policy_arn = aws_iam_policy.mediaconvert_lambda_policy.arn
 }
 
-resource "aws_iam_role" "mediaconvert_job" {
+resource "aws_iam_role" "mediaconvert" {
   name = "${var.mediaconvert_label}-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -96,7 +96,7 @@ resource "aws_iam_role" "mediaconvert_job" {
   })
 }
 
-resource "aws_iam_policy" "mediaconvert_job" {
+resource "aws_iam_policy" "mediaconvert" {
   name = "${var.mediaconvert_label}-policy"
   policy = jsonencode({
     Version = "2012-10-17"
@@ -122,6 +122,6 @@ resource "aws_iam_policy" "mediaconvert_job" {
 }
 
 resource "aws_iam_role_policy_attachment" "mediaconvert_job_policy_basic_execution" {
-  role       = aws_iam_role.mediaconvert_job.id
-  policy_arn = aws_iam_policy.mediaconvert_job.arn
+  role       = aws_iam_role.mediaconvert.id
+  policy_arn = aws_iam_policy.mediaconvert.arn
 }

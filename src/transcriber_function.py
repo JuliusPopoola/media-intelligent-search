@@ -2,6 +2,7 @@ import json
 import os
 import time
 import boto3
+from pathlib import Path
 
 REGION = os.environ["REGION"]
 TRANSCRIBE_ROLE_ARN = os.environ["TRANSCRIBE_ROLE_ARN"]
@@ -17,9 +18,9 @@ def lambda_handler(event, context):
     body = {}
     
     if "objectcreated" not in eventName.lower():
+        statusCode = 400
         body = {
-            'success': True,
-            'message': 'The transcribe request does not require processing, event name is ' +  eventName
+            'error': 'The transcribe request is not valid'
         }
         
         return {
@@ -31,11 +32,11 @@ def lambda_handler(event, context):
             }
         }        
 
-    inputBucket = event["Records"][0]["s3"]["bucket"]["name"]
-    inputBucketKey = event["Records"][0]["s3"]["object"]["key"]
-
     try:
-        job_name = inputBucketKey
+        inputBucket = event["Records"][0]["s3"]["bucket"]["name"]
+        inputBucketKey = event["Records"][0]["s3"]["object"]["key"]
+        
+        job_name = get_filename_without_ext(inputBucketKey)
         transcribe.start_transcription_job(
             TranscriptionJobName = job_name,
             Media = {
@@ -45,21 +46,15 @@ def lambda_handler(event, context):
             OutputKey = job_name + '.json', 
             Subtitles = {
                 'Formats': [
-                    'vtt','srt'
+                    'srt'
                 ],
                 'OutputStartIndex': 1 
-            },
-            Settings = {
-                 'ShowSpeakerLabels': True,
             },
             JobExecutionSettings={
                 'AllowDeferredExecution': True,
                 'DataAccessRoleArn': TRANSCRIBE_ROLE_ARN
             },
-            IdentifyLanguage = True,
-            LanguageOptions=[
-                'af-ZA'|'ar-AE'|'ar-SA'|'da-DK'|'de-CH'|'de-DE'|'en-AB'|'en-AU'|'en-GB'|'en-IE'|'en-IN'|'en-US'|'en-WL'|'es-ES'|'es-US'|'fa-IR'|'fr-CA'|'fr-FR'|'he-IL'|'hi-IN'|'id-ID'|'it-IT'|'ja-JP'|'ko-KR'|'ms-MY'|'nl-NL'|'pt-BR'|'pt-PT'|'ru-RU'|'ta-IN'|'te-IN'|'tr-TR'|'zh-CN'|'zh-TW'|'th-TH'|'en-ZA'|'en-NZ'|'vi-VN'|'sv-SE',
-            ],
+            IdentifyLanguage = True
         )
 
         while True:
@@ -70,7 +65,6 @@ def lambda_handler(event, context):
             time.sleep(5)
 
         print(status)
-        
         body = {
             'success': True
         }
@@ -94,3 +88,6 @@ def lambda_handler(event, context):
                 'Access-Control-Allow-Origin': '*'
             }
         }
+        
+def get_filename_without_ext(filePath):
+    return Path(filePath).stem

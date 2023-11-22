@@ -17,7 +17,7 @@ resource "aws_lambda_function" "mediaconvert_lambda" {
       env                   = var.environment
       REGION                = var.region,
       OUTPUT_BUCKET         = var.outstream_bucket_name,
-      MEDIACONVERT_ROLE_ARN = aws_iam_role.mediaconvert_job.arn,
+      MEDIACONVERT_ROLE_ARN = aws_iam_role.mediaconvert.arn,
       MEDIACONVERT_ENDPOINT = var.mediaconvert_endpoint,
     }
   }

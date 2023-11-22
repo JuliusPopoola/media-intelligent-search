@@ -3,7 +3,7 @@ output "arn" {
 }
 
 output "mediaconvert_role_arn" {
-  value = aws_iam_role.mediaconvert_job
+  value = aws_iam_role.mediaconvert
 }
 
 output "lambda_role_arn" {

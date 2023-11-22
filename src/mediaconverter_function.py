@@ -17,9 +17,9 @@ def lambda_handler(event, context):
     body = {}
     
     if "objectcreated" not in eventName.lower():
+        statusCode = 400
         body = {
-            'success': True,
-            'message': 'The transcode event does not require processing, event name is ' +  eventName
+            'error': 'The transcode request is not valid'
         }
         
         return {
@@ -31,12 +31,11 @@ def lambda_handler(event, context):
             }
         }        
 
-    inputBucket = event["Records"][0]["s3"]["bucket"]["name"]
-    inputBucketKey = event["Records"][0]["s3"]["object"]["key"]
-
-    destinationS3 = 's3://' + OUTPUT_BUCKET + '/$fn$/'
-
     try:
+        inputBucket = event["Records"][0]["s3"]["bucket"]["name"]
+        inputBucketKey = event["Records"][0]["s3"]["object"]["key"]
+
+        destinationS3 = 's3://' + OUTPUT_BUCKET + '/$fn$/'
         jobMetadata = {
             'assetID': inputBucketKey
         }
