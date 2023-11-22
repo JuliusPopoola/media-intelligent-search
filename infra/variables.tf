@@ -4,6 +4,10 @@ variable "region" {
   default = ""
 }
 
+variable "account_id" {
+  default     = ""
+  description = "The account ID where the servies are being deployed"
+}
 variable "mediaconvert_label" {
   default     = ""
   description = "The label for the media converter"
@@ -12,6 +16,11 @@ variable "mediaconvert_label" {
 variable "transcribe_label" {
   default     = ""
   description = "The label for transcribe"
+}
+
+variable "kendra_label" {
+  default     = ""
+  description = "The label for kendra"
 }
 
 variable "mediaconvert_lambda_handler_name" {
@@ -24,6 +33,10 @@ variable "transcribe_lambda_handler_name" {
   description = "Name of the Lambda handler that receives S3 trigger to create a transcribe job"
 }
 
+variable "kendra_source_lambda_handler_name" {
+  default     = ""
+  description = "Name of the Lambda handler that receives S3 trigger to load documents into Kendra"
+}
 variable "runtime" {
   default     = ""
   description = "The Lambda handler runtime"

@@ -14,8 +14,8 @@ resource "aws_s3_bucket_ownership_controls" "outstream_bucket" {
 
 resource "aws_s3_bucket_acl" "outstream_bucket" {
   depends_on = [aws_s3_bucket_ownership_controls.outstream_bucket]
-  bucket = aws_s3_bucket.outstream_bucket.id
-  acl    = "private"
+  bucket     = aws_s3_bucket.outstream_bucket.id
+  acl        = "private"
 }
 
 resource "aws_s3_bucket_notification" "outstream-lambda-trigger" {

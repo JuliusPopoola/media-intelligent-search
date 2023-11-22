@@ -40,3 +40,21 @@ resource "aws_lambda_function" "transcribe_lambda" {
     }
   }
 }
+
+resource "aws_lambda_function" "kendra_source_lambda" {
+  function_name    = "${var.kendra_label}-lambda-function"
+  role             = aws_iam_role.kendra_source_lambda_role.arn
+  handler          = "${var.kendra_source_lambda_handler_name}.lambda_handler"
+  runtime          = var.runtime
+  timeout          = var.timeout
+  filename         = "../src.zip"
+  source_code_hash = data.archive_file.lambda_source.output_base64sha256
+  environment {
+    variables = {
+      env                       = var.environment
+      REGION                    = var.region,
+      KENDRA_BATCH_PUT_ROLE_ARN = "aws_iam_role.kendra_batch_put.arn",
+      KENDRA_INDEX_NAME         = aws_kendra_index.kendra.name
+    }
+  }
+}
