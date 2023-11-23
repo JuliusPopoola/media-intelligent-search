@@ -18,6 +18,11 @@ variable "transcribe_label" {
   description = "The label for transcribe"
 }
 
+variable "lang_chain_llm_label" {
+  default     = ""
+  description = "The label for Lang Chain LLM"
+}
+
 variable "kendra_label" {
   default     = ""
   description = "The label for kendra"
@@ -36,6 +41,11 @@ variable "transcribe_lambda_handler_name" {
 variable "kendra_source_lambda_handler_name" {
   default     = ""
   description = "Name of the Lambda handler that receives S3 trigger to load documents into Kendra"
+}
+
+variable "lang_chain_llm_lambda_handler_name" {
+  default = ""
+  description = "Name of the Lambda for the LLM and Lang Chain"
 }
 variable "runtime" {
   default     = ""
@@ -77,4 +87,16 @@ variable "transcribe_bucket_name" {
 variable "mediaconvert_endpoint" {
   default     = ""
   description = "The media converter end point"
+}
+
+variable "batch_size" {
+  default     = 100
+  type        = number
+  description = "The number of words that is ignested in Kendra from the transcript"
+}
+
+variable "overlap_range" {
+  default     = 50
+  type        = number
+  description = "The overlap range for the collection of words that is ignested in Kendra from the transcript"
 }
