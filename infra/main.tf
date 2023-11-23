@@ -54,7 +54,9 @@ resource "aws_lambda_function" "kendra_source_lambda" {
       env                       = var.environment
       REGION                    = var.region,
       KENDRA_BATCH_PUT_ROLE_ARN = "aws_iam_role.kendra_batch_put.arn",
-      KENDRA_INDEX_NAME         = aws_kendra_index.kendra.name
+      KENDRA_INDEX_NAME         = aws_kendra_index.kendra.id,
+      OVERLAP_RANGE             = var.overlap_range,
+      BATCH_SIZE                = var.batch_size
     }
   }
 }
