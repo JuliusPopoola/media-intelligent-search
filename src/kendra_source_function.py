@@ -36,6 +36,7 @@ def lambda_handler(event, context):
             }
         } 
   
+    counter = 0
     index = 0
     document = {}
     documents = []
@@ -44,11 +45,11 @@ def lambda_handler(event, context):
         response = s3.get_object(Bucket=inputBucket, Key=inputBucketKey)
         object_content = response["Body"].read().decode("utf-8").split("\n")
 
+        title = Path(inputBucketKey).stem
         for item in object_content:
             if "".__eq__(item.strip()):
                 index = 0
                 document = {}
-                document["document_title"] = Path(inputBucketKey).stem
             else:
                 match index:
                     case 0:
@@ -57,16 +58,27 @@ def lambda_handler(event, context):
                         document["start_time"], document["end_time"] = split_timestamp(item)
                     case 2:
                         document["content"] = item
-                        documents.append(document)
+                        documents.append(transform(title, document))
+                        
+                        if counter == 9:
+                            counter = 0
+                            result = kendra.batch_put_document(
+                                IndexId = KENDRA_INDEX_NAME,
+                                Documents = documents
+                            )
+                            print(result)
+                            documents = []
+                        else:
+                            counter += 1
                 index += 1
-                
-        result = kendra.batch_put_document(
-            IndexId = KENDRA_INDEX_NAME,
-            Documents = documents
-        )
-        
-        print(result)
 
+        if counter > 0:
+            result = kendra.batch_put_document(
+                IndexId = KENDRA_INDEX_NAME,
+                Documents = documents
+            )
+            print(result)
+            
         body = {
             'success': True
         }
@@ -96,3 +108,11 @@ def split_timestamp(timestamp):
     start_time = timestamp[0:index].strip()
     end_time = timestamp[index+3:].strip()
     return start_time, end_time
+    
+def transform(title, doc):
+    return {
+        "Id": doc["document_id"],
+        "Blob": json.dumps(doc),
+        "ContentType": "PLAIN_TEXT",
+        "Title": title
+    }
