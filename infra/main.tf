@@ -60,3 +60,19 @@ resource "aws_lambda_function" "kendra_source_lambda" {
     }
   }
 }
+
+resource "aws_lambda_function" "lang_chain_llm_lambda" {
+  function_name    = "${var.lang_chain_llm_label}-lambda-function"
+  role             = aws_iam_role.lang_chain_llm.arn
+  handler          = "${var.lang_chain_llm_lambda_handler_name}.lambda_handler"
+  runtime          = var.runtime
+  timeout          = var.timeout
+  filename         = "../src.zip"
+  source_code_hash = data.archive_file.lambda_source.output_base64sha256
+  environment {
+    variables = {
+      env    = var.environment
+      REGION = var.region
+    }
+  }
+}

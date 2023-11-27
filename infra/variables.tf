@@ -44,7 +44,7 @@ variable "kendra_source_lambda_handler_name" {
 }
 
 variable "lang_chain_llm_lambda_handler_name" {
-  default = ""
+  default     = ""
   description = "Name of the Lambda for the LLM and Lang Chain"
 }
 variable "runtime" {
