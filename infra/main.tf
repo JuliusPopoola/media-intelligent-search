@@ -1,6 +1,6 @@
-data "archive_file" "lambda_source" {
-  source_dir  = "../src/"
-  output_path = "../src.zip"
+data "archive_file" "mediaconvert_source" {
+  source_dir  = "../src/mediaconvert"
+  output_path = "../mediaconvert.zip"
   type        = "zip"
 }
 
@@ -10,8 +10,8 @@ resource "aws_lambda_function" "mediaconvert_lambda" {
   handler          = "${var.mediaconvert_lambda_handler_name}.lambda_handler"
   runtime          = var.runtime
   timeout          = var.timeout
-  filename         = "../src.zip"
-  source_code_hash = data.archive_file.lambda_source.output_base64sha256
+  filename         = "../mediaconvert.zip"
+  source_code_hash = data.archive_file.mediaconvert_source.output_base64sha256
   environment {
     variables = {
       env                   = var.environment
@@ -23,14 +23,20 @@ resource "aws_lambda_function" "mediaconvert_lambda" {
   }
 }
 
+data "archive_file" "transcribe_lambda_zip" {
+  source_dir  = "../src/transcribe"
+  output_path = "../transcribe.zip"
+  type        = "zip"
+}
+
 resource "aws_lambda_function" "transcribe_lambda" {
   function_name    = "${var.transcribe_label}-lambda-function"
   role             = aws_iam_role.transcribe_lambda_role.arn
   handler          = "${var.transcribe_lambda_handler_name}.lambda_handler"
   runtime          = var.runtime
   timeout          = var.timeout
-  filename         = "../src.zip"
-  source_code_hash = data.archive_file.lambda_source.output_base64sha256
+  filename         = "../transcribe.zip"
+  source_code_hash = data.archive_file.transcribe_lambda_zip.output_base64sha256
   environment {
     variables = {
       env                      = var.environment
@@ -41,14 +47,20 @@ resource "aws_lambda_function" "transcribe_lambda" {
   }
 }
 
+data "archive_file" "kendra_lambda_zip" {
+  source_dir  = "../src/kendra"
+  output_path = "../kendra.zip"
+  type        = "zip"
+}
+
 resource "aws_lambda_function" "kendra_source_lambda" {
   function_name    = "${var.kendra_label}-lambda-function"
   role             = aws_iam_role.kendra_source_lambda_role.arn
   handler          = "${var.kendra_source_lambda_handler_name}.lambda_handler"
   runtime          = var.runtime
   timeout          = var.timeout
-  filename         = "../src.zip"
-  source_code_hash = data.archive_file.lambda_source.output_base64sha256
+  filename         = "../kendra.zip"
+  source_code_hash = data.archive_file.kendra_lambda_zip.output_base64sha256
   environment {
     variables = {
       env                       = var.environment
@@ -61,18 +73,34 @@ resource "aws_lambda_function" "kendra_source_lambda" {
   }
 }
 
+data "archive_file" "langchainllm_source" {
+  source_dir  = "../src/langchainllm"
+  output_path = "../langchainllm.zip"
+  type        = "zip"
+}
+
 resource "aws_lambda_function" "lang_chain_llm_lambda" {
   function_name    = "${var.lang_chain_llm_label}-lambda-function"
   role             = aws_iam_role.lang_chain_llm.arn
   handler          = "${var.lang_chain_llm_lambda_handler_name}.lambda_handler"
   runtime          = var.runtime
   timeout          = var.timeout
-  filename         = "../src.zip"
-  source_code_hash = data.archive_file.lambda_source.output_base64sha256
+  filename         = "../langchainllm.zip"
+  source_code_hash = data.archive_file.langchainllm_source.output_base64sha256
   environment {
     variables = {
       env    = var.environment
       REGION = var.region
     }
   }
+
+  architectures = ["arm64"]
+  layers = [aws_lambda_layer_version.lang_chain_llm_layer.arn]
+}
+
+resource "aws_lambda_layer_version" "lang_chain_llm_layer" {
+  layer_name = "${var.lang_chain_llm_label}-layer"
+  filename = "../langchain.zip"
+  compatible_runtimes = [var.runtime]
+  compatible_architectures = ["arm64"]
 }

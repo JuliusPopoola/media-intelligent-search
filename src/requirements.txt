@@ -1,2 +1,2 @@
-boto3
-langchain
+boto3==1.33.2
+langchain==0.0.342
